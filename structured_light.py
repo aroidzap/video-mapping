@@ -11,7 +11,7 @@ class StructuredLight:
         raise NotImplementedError()
     def process_color(self, images, gamma_correction = 2.2):
         return np.mean([np.min(images, axis=0), np.max(images, axis=0)], axis = 0) ** (1 / gamma_correction)
-    def capture(self, projector_callback, capture_callback, wait_time = 1000, flush_frames = 3, gamma_correction = 2.2):
+    def capture(self, projector_callback, capture_callback, wait_time = 500, flush_frames = 3, gamma_correction = 2.2):
         # full white
         projector_callback(255 * np.ones(self.projector_shape, np.uint8))
         # camera preview
@@ -150,17 +150,16 @@ if __name__ == "__main__":
     import os
     import pickle
     from camera import Camera
-    cast = __import__('opencv-chromecast')
+    from opencv_chromecast import Chromecast
 
     sl = GrayCodeStructuredLight((480, 854))
-
-    if(os.path.exists('images.pickle') and input('Load pickle (Y/n)?') != 'n'):
+    
+    if False and os.path.exists('images.pickle') and input('Load pickle (Y/n)?') != 'n':
         pattern_images = pickle.load(open('images.pickle','rb'))
     else:
         camera = Camera()
-        chromecast = cast.Chromecast("10.0.0.195")
-
-        pattern_images = sl.capture(chromecast.imshow, camera.capture)
+        with Chromecast("10.0.0.82") as cc:
+            pattern_images = sl.capture(cc.imshow, camera.capture)
         pickle.dump(pattern_images, open('images.pickle','wb'))
 
     projector_map = sl.process_images(pattern_images)
@@ -179,5 +178,6 @@ if __name__ == "__main__":
     # img = cv2.imread("lama.jpg")
     # img = cv2.remap(img, projector_map[:,:,:2].astype(np.float32), (), cv2.INTER_LINEAR)
 
-    # if chromecast is not None:
-    #   chromecast.imshow(img)
+    # with Chromecast("10.0.0.82") as cc:
+    #     cc.imshow(img)
+    #     time.sleep(10)

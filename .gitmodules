@@ -1,4 +1,4 @@
 [submodule "opencv-chromecast"]
-	path = opencv-chromecast
+	path = opencv_chromecast
 	url = https://github.com/aroidzap/opencv-chromecast.git
 	branch = master
